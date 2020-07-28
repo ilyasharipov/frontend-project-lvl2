@@ -1,0 +1,24 @@
+{
+  "name": "gendiff",
+  "version": "0.0.1",
+  "description": "Compares two configuration files and shows a difference.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilyasharipov/frontend-project-lvl2.git"
+  },
+  "keywords": [
+    "gendiff",
+    "finder",
+    "console"
+  ],
+  "author": "Ilya Sharipov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ilyasharipov/frontend-project-lvl2/issues"
+  },
+  "homepage": "https://github.com/ilyasharipov/frontend-project-lvl2#readme"
+}
