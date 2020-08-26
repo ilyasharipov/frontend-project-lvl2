@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const { version, description } = require('../package');
 
 commander
-    .version(version)
-    .description(description);
+  .version(version)
+  .description(description);
 
 commander.parse();
