@@ -10,4 +10,4 @@ commander
     .version(version)
     .description(description);
 
-commander.parse()
+commander.parse();
