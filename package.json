@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/ilyasharipov/frontend-project-lvl2#readme",
   "dependencies": {
-    "commander": "^6.2.0"
+    "commander": "^6.2.0",
+    "lodash": "^4.17.20"
   },
   "devDependencies": {
     "@jest/globals": "^26.6.1",
