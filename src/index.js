@@ -21,5 +21,6 @@ export default (beforeFile, afterFile, format = '') => {
     return acc;
   }, []);
   console.log(format);
+  // console.log(format);
   return `{\n${diff.join('')}}\n`;
 };
