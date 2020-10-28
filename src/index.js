@@ -1,9 +1,7 @@
 import _ from 'lodash';
+import { readFile } from './utils.js';
 
-export default (beforeFile, afterFile, format = '') => {
-  const obj1 = JSON.parse(beforeFile);
-  const obj2 = JSON.parse(afterFile);
-
+const getDiff = (obj1, obj2) => {
   const keys = _.union(Object.keys(obj1), Object.keys((obj2))).sort();
 
   const diff = keys.reduce((acc, key) => {
@@ -20,7 +18,14 @@ export default (beforeFile, afterFile, format = '') => {
 
     return acc;
   }, []);
-  console.log(format);
-  // console.log(format);
+
   return `{\n${diff.join('')}}\n`;
+};
+
+export default (beforeFile, afterFile, format = '') => {
+  const obj1 = JSON.parse(readFile(beforeFile));
+  const obj2 = JSON.parse(readFile(afterFile));
+  console.log(format);
+
+  return getDiff(obj1, obj2);
 };
