@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { readFile } from './utils.js';
+import path from 'path';
+import parser from './parsers.js';
 
 const getDiff = (obj1, obj2) => {
   const keys = _.union(Object.keys(obj1), Object.keys((obj2))).sort();
@@ -22,10 +23,12 @@ const getDiff = (obj1, obj2) => {
   return `{\n${diff.join('')}}\n`;
 };
 
-export default (beforeFile, afterFile, format = '') => {
-  const obj1 = JSON.parse(readFile(beforeFile));
-  const obj2 = JSON.parse(readFile(afterFile));
+export default (beforeFile, afterFile, format) => {
+  const formatBeforeFile = path.extname(beforeFile);
+  const formatAfterFile = path.extname(afterFile);
   console.log(format);
+  const obj1 = parser(beforeFile, formatBeforeFile);
+  const obj2 = parser(afterFile, formatAfterFile);
 
   return getDiff(obj1, obj2);
 };
