@@ -15,24 +15,24 @@ const getAst = (beforeFile, afterFile) => {
 
   const ast = keys.reduce((acc, key) => {
       if (!_.has(beforeFile, key)) {
-        acc.push(buildNode(key, null, afterFile, 'added', null));
+        acc.push(buildNode(key, null, afterFile[key], 'added', null));
       } else if (!_.has(afterFile, key)) {
-        acc.push(buildNode(key, beforeFile, null, 'deleted', null));
+        acc.push(buildNode(key, beforeFile[key], null, 'deleted', null));
       } else if (_.has(beforeFile, key) && _.has(afterFile, key)) {
           if (_.isObject(beforeFile[key]) && _.isObject(afterFile[key])) {
             acc.push(buildNode(key, null, null, 'nested', getAst(beforeFile[key], afterFile[key])));
           } else {
               if (beforeFile[key] === afterFile[key]) {
-                  acc.push(buildNode(key, beforeFile, null, 'unchanged', null));
+                  acc.push(buildNode(key, beforeFile[key], null, 'unchanged', null));
               } else {
-                  acc.push(buildNode(key, beforeFile, afterFile, 'changed', null));
+                  acc.push(buildNode(key, beforeFile[key], afterFile[key], 'changed', null));
               }
           }
       }
 
       return acc;
   }, []);
-    console.log(ast);
+    // console.log(ast);
   return ast;
 };
 export default getAst;

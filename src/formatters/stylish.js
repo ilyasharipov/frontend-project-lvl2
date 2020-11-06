@@ -1,22 +1,45 @@
 import _ from 'lodash';
 
-export default (obj1, obj2) => {
-  const keys = _.union(Object.keys(obj1), Object.keys((obj2))).sort();
+const getStylishData = (ast, depth = 0) => {
+  // console.log(JSON.stringify(ast), '\n');
+  const str = '    ';
+  const indent = str.repeat(depth);
 
-  const diff = keys.reduce((acc, key) => {
-    if (!_.has(obj1, key)) {
-      acc.push(`  + ${key}: ${obj2[key]}\n`);
-    } else if (!_.has(obj2, key)) {
-      acc.push(`  - ${key}: ${obj1[key]}\n`);
-    } else if (obj1[key] !== obj2[key]) {
-      acc.push(`  - ${key}: ${obj1[key]}\n`);
-      acc.push(`  + ${key}: ${obj2[key]}\n`);
-    } else if (obj1[key] === obj2[key]) {
-      acc.push(`    ${key}: ${obj2[key]}\n`);
+  const stylishData = ast.reduce((acc, node) => {
+    switch (node['type']) {
+      case 'added':
+        acc.push(`${indent}  + ${node['key']}: ${stringify(node['afterValue'], depth)}`);
+        break;
+      case 'deleted':
+        acc.push(`${indent}  - ${node['key']}: ${stringify(node['beforeValue'], depth)}`);
+        break;
+      case 'changed':
+        acc.push([`${indent}  - ${node['key']}: ${stringify(node['beforeValue'], depth)}`]);
+        acc.push([`${indent}  + ${node['key']}: ${stringify(node['afterValue'], depth)}`]);
+        // acc.push(indent + "  - " + node['key'] + ": " + objectToStr(node["beforeValue"], depth) + "\n" + indent + "  + " + node["key"] + ": " + objectToStr(node["afterValue"], depth));
+        break;
+      case 'unchanged':
+        acc.push(`${indent}    ${node['key']}: ${stringify(node['beforeValue'], depth)}`);
+        break;
+      case 'nested':
+        acc.push(`${indent}    ${node['key']}: ${getStylishData(node['children'], depth + 1)}`);
+        break;
     }
 
     return acc;
   }, []);
-
-  return `{\n${diff.join('')}}\n`;
+  // console.log(stylishData);
+  return `{\n${stylishData.join('\n')} ${indent}\n}`;
 };
+
+const stringify = (value, depth) => {
+  const indent = '    '.repeat(depth);
+  if (!_.isObject(value)) {
+    return value;
+  }
+  const keysOfObject = Object.keys(value);
+  const comlexValues = keysOfObject.map((key) => `        ${key}: ${value[key]}`);
+  return `{\n${indent}${comlexValues.join('')}\n${indent}    }`;
+};
+
+export default getStylishData;
