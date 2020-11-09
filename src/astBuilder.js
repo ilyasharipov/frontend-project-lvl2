@@ -21,12 +21,10 @@ const getAst = (beforeFile, afterFile) => {
     } else if (_.has(beforeFile, key) && _.has(afterFile, key)) {
       if (_.isObject(beforeFile[key]) && _.isObject(afterFile[key])) {
         acc.push(buildNode(key, null, null, 'nested', getAst(beforeFile[key], afterFile[key])));
+      } else if (beforeFile[key] === afterFile[key]) {
+        acc.push(buildNode(key, beforeFile[key], null, 'unchanged', null));
       } else {
-        if (beforeFile[key] === afterFile[key]) {
-          acc.push(buildNode(key, beforeFile[key], null, 'unchanged', null));
-        } else {
-          acc.push(buildNode(key, beforeFile[key], afterFile[key], 'changed', null));
-        }
+        acc.push(buildNode(key, beforeFile[key], afterFile[key], 'changed', null));
       }
     }
 
