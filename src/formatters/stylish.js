@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 const getStylishData = (ast, depth = 0) => {
-  // console.log(JSON.stringify(ast), '\n');
   const str = '    ';
   const indent = str.repeat(depth);
 
@@ -16,7 +15,6 @@ const getStylishData = (ast, depth = 0) => {
       case 'changed':
         acc.push([`${indent}  - ${node['key']}: ${stringify(node['beforeValue'], depth)}`]);
         acc.push([`${indent}  + ${node['key']}: ${stringify(node['afterValue'], depth)}`]);
-        // acc.push(indent + "  - " + node['key'] + ": " + objectToStr(node["beforeValue"], depth) + "\n" + indent + "  + " + node["key"] + ": " + objectToStr(node["afterValue"], depth));
         break;
       case 'unchanged':
         acc.push(`${indent}    ${node['key']}: ${stringify(node['beforeValue'], depth)}`);
@@ -28,18 +26,30 @@ const getStylishData = (ast, depth = 0) => {
 
     return acc;
   }, []);
-  // console.log(stylishData);
-  return `{\n${stylishData.join('\n')} ${indent}\n}`;
+
+  return `{\n${stylishData.join('\n')}\n${indent}}`;
 };
 
 const stringify = (value, depth) => {
   const indent = '    '.repeat(depth);
-  if (!_.isObject(value)) {
+  if (!_.isPlainObject(value)) {
     return value;
   }
-  const keysOfObject = Object.keys(value);
-  const comlexValues = keysOfObject.map((key) => `        ${key}: ${value[key]}`);
-  return `{\n${indent}${comlexValues.join('')}\n${indent}    }`;
+
+  const res = Object.entries(value);
+
+  const complex = res.map((item) => {
+    const [key, value] = item;
+
+    if (_.isPlainObject(value)) {
+      return `        ${key}: ${stringify(value, depth + 1)}`;
+    }
+    const indent =  '    '.repeat(depth);
+    return `${indent}${key}: ${value}`;
+  });
+
+  return `{\n${indent}${complex.join('\n')}\n${indent}    }`;
+
 };
 
 export default getStylishData;
