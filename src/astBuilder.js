@@ -32,7 +32,6 @@ const getAst = (beforeFile, afterFile) => {
 
       return acc;
   }, []);
-    // console.log(ast);
   return ast;
 };
 export default getAst;

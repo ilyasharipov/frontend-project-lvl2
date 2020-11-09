@@ -40,16 +40,17 @@ const stringify = (value, depth) => {
 
   const complex = res.map((item) => {
     const [key, value] = item;
+    const indent =  '    '.repeat(depth);
 
     if (_.isPlainObject(value)) {
       return `        ${key}: ${stringify(value, depth + 1)}`;
     }
-    const indent =  '    '.repeat(depth);
-    return `${indent}${key}: ${value}`;
+
+    return `        ${key}: ${value}`;
   });
 
   return `{\n${indent}${complex.join('\n')}\n${indent}    }`;
 
 };
 
-export default getStylishData;
+export default (tree) => `${getStylishData(tree)}\n`;

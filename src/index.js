@@ -1,7 +1,7 @@
 import path from 'path';
 import getDiff from './astBuilder';
 import parser from './parsers.js';
-import getStylishData from "./formatters/stylish";
+import getStylishOutput from './formatters/stylish';
 
 export default (beforeFile, afterFile, format) => {
   const formatBeforeFile = path.extname(beforeFile);
@@ -12,5 +12,5 @@ export default (beforeFile, afterFile, format) => {
 
   const diff = getDiff(obj1, obj2);
 
-  return getStylishData(diff);
+  return getStylishOutput(diff);
 };
