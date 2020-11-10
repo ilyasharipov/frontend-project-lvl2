@@ -10,12 +10,3 @@ const dataJson2 = getFixturePath('file2.json');
 test('testing flat json', () => {
   expect(genDiff(dataJson1, dataJson2, 'json')).toBe(expected);
 });
-
-// const dataYml1 = getFixturePath('file1.yml');
-// const dataYml2 = getFixturePath('file2.yml');
-//
-// test('testing flat yml', () => {
-//   expect(genDiff(dataYml1, dataYml2, 'yml')).toBe(expected);
-// });
-//
-// const expected2 = readFixtureFile('expected2');
