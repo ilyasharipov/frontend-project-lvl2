@@ -1,8 +1,7 @@
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import ini from 'ini';
 import { readFile } from './utils.js';
-
-import _ from 'lodash';
 
 const iniParser = (content) => {
   const data = ini.parse(content);
@@ -15,7 +14,7 @@ const iniParser = (content) => {
       return { ...acc, [key]: value };
     }
     if (!Number.isNaN(Number(value))) {
-      return { ...acc, [key]: value !== null && value !== '' ? Number(value) : value };
+      return { ...acc, [key]: value !== null && value !== '' && value !== undefined && !Number.isNaN(value) ? Number(value) : value };
     }
     return { ...acc, [key]: value };
   }, {});
@@ -32,7 +31,7 @@ export default (data, format) => {
     case '.yml':
       return yaml.safeLoad(readFile(data));
     case '.ini':
-      return iniParser(readFile(data)); //ini.parse(readFile(data));
+      return iniParser(readFile(data));
     default:
       throw new Error(`Unknown data format: ${format}`);
   }

@@ -9,7 +9,7 @@ const getFormatOutput = (tree, format) => {
     case 'plain':
       return getPlainOutput(tree);
     case 'json':
-        return getJsonOutput(tree);
+      return getJsonOutput(tree);
     default:
       throw new Error(`Unknown format: ${format}`);
   }
