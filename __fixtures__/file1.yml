@@ -13,5 +13,5 @@ group1:
     key: 'value'
 group2:
   abc: 12345
-  deep:
+  deep: 
     id: 45
