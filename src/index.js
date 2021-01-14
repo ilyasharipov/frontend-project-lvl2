@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import parse from './parsers.js';
 import formatDiffTree from './formatters/index.js';
-import generateDiffTree from './astBuilder';
+import generateDiffTree from './astBuilder.js';
 
 const makeAbsolutePath = (filepath) => path.resolve(process.cwd(), filepath);
 const getFormat = (filepath) => path.extname(filepath).slice(1);
