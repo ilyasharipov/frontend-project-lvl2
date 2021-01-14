@@ -2,17 +2,7 @@
   "name": "@hexlet/code",
   "version": "0.0.2",
   "description": "Compares two configuration files and shows a difference.",
-  "type": "module",
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {}
-  },
-  "bin": {
-    "gendiff": "bin/gendiff.js"
-  },
-  "engines": {
-    "node": ">=14"
-  },
+  "main": "./src/index.js",
   "scripts": {
     "test": "npx jest"
   },
@@ -20,17 +10,28 @@
     "type": "git",
     "url": "git+https://github.com/ilyasharipov/frontend-project-lvl2.git"
   },
-  "keywords": [
-    "gendiff",
-    "finder",
-    "console"
-  ],
+  "type": "module",
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  },
   "author": "Ilya Sharipov",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ilyasharipov/frontend-project-lvl2/issues"
   },
   "homepage": "https://github.com/ilyasharipov/frontend-project-lvl2#readme",
+  "bin": {
+    "gendiff": "bin/gendiff.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "gendiff",
+    "finder",
+    "console"
+  ],
   "dependencies": {
     "commander": "^6.2.1",
     "ini": "^1.3.8",
@@ -39,12 +40,12 @@
   },
   "devDependencies": {
     "@jest/globals": "^26.6.2",
-    "eslint": "^7.17.0",
+    "@types/node": "^14.14.8",
+    "eslint": "^7.13.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-jest": "^24.1.3",
     "jest": "^26.6.3",
     "jest-cli": "^26.6.3"
-  },
-  "main": "index.js"
+  }
 }

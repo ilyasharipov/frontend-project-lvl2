@@ -1,13 +1,15 @@
 import { test, expect } from '@jest/globals';
 import genDiff from '../src/index.js';
-import { getFixturePath, readFixtureFile } from '../src/utils.js';
+import { readFixtureFile } from '../src/utils.js';
+
+const generatePathname = (path) => new URL(`../__fixtures__/${path}`, import.meta.url).pathname;
 
 const expectedStylish = readFixtureFile('expectedStylish');
 const expectedPlain = readFixtureFile('expectedPlain');
 const expectedJson = readFixtureFile('expectedJson.json');
 
-const dataJson1 = getFixturePath('file1.json');
-const dataJson2 = getFixturePath('file2.json');
+const dataJson1 = generatePathname('file1.json');
+const dataJson2 = generatePathname('file2.json');
 
 // json files test
 test('testing default json', () => {
@@ -27,8 +29,8 @@ test('testing json plain', () => {
 });
 
 // yml files test
-const dataYml1 = getFixturePath('file1.yml');
-const dataYml2 = getFixturePath('file2.yml');
+const dataYml1 = generatePathname('file1.yml');
+const dataYml2 = generatePathname('file2.yml');
 
 test('testing yml default', () => {
   expect(genDiff(dataYml1, dataYml2)).toBe(expectedStylish);
@@ -47,8 +49,8 @@ test('testing yml plain', () => {
 });
 
 // ini files test
-const dataIni1 = getFixturePath('file1.ini');
-const dataIni2 = getFixturePath('file2.ini');
+const dataIni1 = generatePathname('file1.ini');
+const dataIni2 = generatePathname('file2.ini');
 
 test('testing ini default', () => {
   expect(genDiff(dataIni1, dataIni2)).toBe(expectedStylish);
