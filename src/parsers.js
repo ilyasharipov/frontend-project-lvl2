@@ -1,38 +1,15 @@
-import _ from 'lodash';
 import yaml from 'js-yaml';
-import ini from 'ini';
-import { readFile } from './utils.js';
 
-const iniParser = (content) => {
-  const data = ini.parse(content);
-
-  const iter = (node) => Object.entries(node).reduce((acc, [key, value]) => {
-    if (_.isObjectLike(value)) {
-      return { ...acc, [key]: iter(value) };
-    }
-    if (typeof (value) === 'boolean') {
-      return { ...acc, [key]: value };
-    }
-    if (!Number.isNaN(Number(value))) {
-      return { ...acc, [key]: value !== null && value !== '' && value !== undefined && !Number.isNaN(value) ? Number(value) : value };
-    }
-    return { ...acc, [key]: value };
-  }, {});
-
-  return iter(data);
+const types = {
+  json: JSON.parse,
+  yml: yaml.safeLoad,
 };
 
-export default (data, format) => {
-  switch (format) {
-    case '.json':
-      return JSON.parse(readFile(data));
-    case '.yaml':
-      return yaml.safeLoad(readFile(data));
-    case '.yml':
-      return yaml.safeLoad(readFile(data));
-    case '.ini':
-      return iniParser(readFile(data));
-    default:
-      throw new Error(`Unknown data format: ${format}`);
+export default (data, type) => {
+  const parse = types[type];
+  if (!parse) {
+    const supportedTypes = Object.keys(types).join(', ');
+    throw new Error(`Supported file types are: ${supportedTypes}`);
   }
+  return parse(data);
 };

@@ -1,35 +1,31 @@
-import _ from 'lodash';
+const joinKeys = (parentKeys, key) => [...parentKeys, key].join('.');
 
-const setBraceStingValue = (value) => (!_.isString(value) ? value : `'${value}'`);
-const setComplexValue = (value) => (_.isPlainObject(value) ? '[complex value]' : `${setBraceStingValue(value)}`);
-
-const getPlainData = (ast, ancestry = '') => {
-  const plainData = ast.reduce((acc, node) => {
-    const {
-      type, key, afterValue, beforeValue, children,
-    } = node;
-
-    const newAncestry = `${ancestry}${key}`;
-    switch (type) {
-      case 'added':
-        acc.push(`Property '${newAncestry}' was added with value: ${setComplexValue(afterValue)}`);
-        break;
-      case 'deleted':
-        acc.push(`Property '${newAncestry}' was removed`);
-        break;
-      case 'changed':
-        acc.push([`Property '${newAncestry}' was updated. From ${setComplexValue(beforeValue)} to ${setComplexValue(afterValue)}`]);
-        break;
-      case 'nested':
-        acc.push(getPlainData(children, `${newAncestry}.`));
-        break;
-      default:
-    }
-
-    return acc;
-  }, []);
-
-  return plainData.join('\n');
+const stringify = (value) => {
+  if (typeof value === 'object' && value !== null) {
+    return '[complex value]';
+  }
+  if (typeof value === 'string') {
+    return `'${value}'`;
+  }
+  return value;
 };
 
-export default (tree) => `${getPlainData(tree)}\n`;
+const outputMapping = {
+  nested: ({ key, children }, parentKeys, func) => func(children, [...parentKeys, key]),
+  unchanged: () => [],
+  added: ({ key, value }, parentKeys) => `Property '${joinKeys(parentKeys, key)}' was added with value: ${stringify(value)}`,
+  removed: ({ key }, parentKeys) => `Property '${joinKeys(parentKeys, key)}' was removed`,
+  updated: ({ key, newValue, oldValue }, parentKeys) => {
+    const updatedKeyInfo = `Property '${joinKeys(parentKeys, key)}' was updated. `;
+    const updatedValueInfo = `From ${stringify(oldValue)} to ${stringify(newValue)}`;
+    return `${updatedKeyInfo}${updatedValueInfo}`;
+  },
+};
+
+const generatePlain = (diffTree) => {
+  const iter = (innerDiffTree, parentKeys) => innerDiffTree
+      .flatMap((el) => outputMapping[el.type](el, parentKeys, iter));
+  return iter(diffTree, []).join('\n');
+};
+
+export default generatePlain;

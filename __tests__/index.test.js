@@ -1,69 +1,43 @@
-import { test, expect } from '@jest/globals';
-import genDiff from '../src/index.js';
-import { readFixtureFile } from '../src/utils.js';
+import fs from 'fs';
+import gendiff from '../index.js';
 
 const generatePathname = (path) => new URL(`../__fixtures__/${path}`, import.meta.url).pathname;
+const testsSuccessOptions = [
+  ['file1.json', 'file2.yml', 'default'],
+  ['file1.json', 'file2.yml', 'stylish'],
+  ['file1.yml', 'file2.json', 'plain'],
+  ['file1.yml', 'file2.json', 'json'],
+];
+const testsFailOptions = [
+  ['file1.yml', 'file2.json', 'unsupported'],
+  ['file1.yml', 'unsupportedFileType.txt', 'stylish'],
+  ['file1.yml', 'notExistingFile.yml', 'plain'],
+];
 
-const expectedStylish = readFixtureFile('expectedStylish');
-const expectedPlain = readFixtureFile('expectedPlain');
-const expectedJson = readFixtureFile('expectedJson.json');
+describe('gendiff', () => {
+  test.each(testsSuccessOptions)('gendiff for %s & %s in %s format',
+      (file1, file2, formatName) => {
+        if (formatName === 'default') {
+          const fileContent = fs.readFileSync(generatePathname('expected_stylish.txt'), 'utf-8');
+          expect(gendiff(generatePathname(file1), generatePathname(file2)))
+              .toBe(fileContent);
+          return;
+        }
+        if (formatName === 'json') {
+          expect(() => {
+            JSON.parse(gendiff(generatePathname(file1), generatePathname(file2), formatName));
+          }).not.toThrowError();
+        }
 
-const dataJson1 = generatePathname('file1.json');
-const dataJson2 = generatePathname('file2.json');
+        const fileContent = fs.readFileSync(generatePathname(`expected_${formatName}.txt`), 'utf-8');
+        expect(gendiff(generatePathname(file1), generatePathname(file2), formatName))
+            .toBe(fileContent);
+      });
 
-// json files test
-test('testing default json', () => {
-  expect(genDiff(dataJson1, dataJson2)).toBe(expectedStylish);
-});
-
-test('testing json json', () => {
-  expect(genDiff(dataJson1, dataJson2, 'json')).toBe(expectedJson);
-});
-
-test('testing json stylish', () => {
-  expect(genDiff(dataJson1, dataJson2, 'stylish')).toBe(expectedStylish);
-});
-
-test('testing json plain', () => {
-  expect(genDiff(dataJson1, dataJson2, 'plain')).toBe(expectedPlain);
-});
-
-// yml files test
-const dataYml1 = generatePathname('file1.yml');
-const dataYml2 = generatePathname('file2.yml');
-
-test('testing yml default', () => {
-  expect(genDiff(dataYml1, dataYml2)).toBe(expectedStylish);
-});
-
-test('testing yml json', () => {
-  expect(genDiff(dataYml1, dataYml2, 'json')).toBe(expectedJson);
-});
-
-test('testing yml stylish', () => {
-  expect(genDiff(dataYml1, dataYml2, 'stylish')).toBe(expectedStylish);
-});
-
-test('testing yml plain', () => {
-  expect(genDiff(dataYml1, dataYml2, 'plain')).toBe(expectedPlain);
-});
-
-// ini files test
-const dataIni1 = generatePathname('file1.ini');
-const dataIni2 = generatePathname('file2.ini');
-
-test('testing ini default', () => {
-  expect(genDiff(dataIni1, dataIni2)).toBe(expectedStylish);
-});
-
-test('testing ini json', () => {
-  expect(genDiff(dataIni1, dataIni2, 'json')).toBe(expectedJson);
-});
-
-test('testing ini stylish', () => {
-  expect(genDiff(dataIni1, dataIni2, 'stylish')).toBe(expectedStylish);
-});
-
-test('testing ini plain', () => {
-  expect(genDiff(dataIni1, dataIni2, 'plain')).toBe(expectedPlain);
+  test.each(testsFailOptions)('gendiff for %s & %s in %s format',
+      (file1, file2, formatName) => {
+        expect(() => {
+          gendiff(generatePathname(file1), generatePathname(file2), formatName);
+        }).toThrowError();
+      });
 });

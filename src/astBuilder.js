@@ -1,35 +1,32 @@
 import _ from 'lodash';
 
-const buildNode = (key, beforeValue, afterValue, type, children) => (
-  {
-    key,
-    beforeValue,
-    afterValue,
-    type,
-    children,
-  }
-);
+const generateDiffTree = (data1, data2) => {
+    const uniqueKeys = _.union(_.keys(data1), _.keys(data2));
+    const sortedKeys = _.sortBy(uniqueKeys);
 
-const getAst = (beforeFile, afterFile) => {
-  const keys = _.union(Object.keys(beforeFile), Object.keys((afterFile))).sort();
+    return sortedKeys.flatMap((key) => {
+        if (_.isPlainObject(data1[key]) && _.isPlainObject(data2[key])) {
+            return { key, children: generateDiffTree(data1[key], data2[key]), type: 'nested' };
+        }
 
-  const ast = keys.reduce((acc, key) => {
-    if (!_.has(beforeFile, key)) {
-      acc.push(buildNode(key, null, afterFile[key], 'added', null));
-    } else if (!_.has(afterFile, key)) {
-      acc.push(buildNode(key, beforeFile[key], null, 'deleted', null));
-    } else if (_.has(beforeFile, key) && _.has(afterFile, key)) {
-      if (_.isPlainObject(beforeFile[key]) && _.isPlainObject(afterFile[key])) {
-        acc.push(buildNode(key, null, null, 'nested', getAst(beforeFile[key], afterFile[key])));
-      } else if (beforeFile[key] === afterFile[key]) {
-        acc.push(buildNode(key, beforeFile[key], null, 'unchanged', null));
-      } else {
-        acc.push(buildNode(key, beforeFile[key], afterFile[key], 'changed', null));
-      }
-    }
+        if (_.isEqual(data1[key], data2[key])) {
+            return { key, value: data1[key], type: 'unchanged' };
+        }
 
-    return acc;
-  }, []);
-  return ast;
+        if (_.has(data1, key) && _.has(data2, key)) {
+            return {
+                key,
+                newValue: data2[key],
+                oldValue: data1[key],
+                type: 'updated',
+            };
+        }
+
+        if (!_.has(data2, key)) {
+            return { key, value: data1[key], type: 'removed' };
+        }
+        return { key, value: data2[key], type: 'added' };
+    });
 };
-export default getAst;
+
+export default generateDiffTree;

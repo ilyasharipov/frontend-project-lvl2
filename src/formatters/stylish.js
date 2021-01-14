@@ -1,58 +1,38 @@
 import _ from 'lodash';
 
-const stringify = (object, depth) => {
-  const indent = '    '.repeat(depth);
-  if (!_.isPlainObject(object)) {
-    return object;
+const SPACES_COUNT = 4;
+const repeatSpaces = (depth, sliceNum = 0) => ' '.repeat(depth * SPACES_COUNT).slice(sliceNum);
+const stringify = (data, depth, mapping) => {
+  if (!_.isPlainObject(data)) {
+    return data;
   }
-
-  const packedStrings = Object.entries(object).map((item) => {
-    const [key, value] = item;
-
-    if (_.isPlainObject(value)) {
-      return `        ${key}: ${stringify(value, depth + 1)}`;
-    }
-
-    return `        ${key}: ${value}`;
-  });
-
-  return `{\n${indent}${packedStrings.join('\n')}\n${indent}    }`;
+  const dataEntries = Object.entries(data)
+      .map(([key, value]) => mapping.unchanged({ key, value }, depth + 1))
+      .join('\n');
+  return `{\n${dataEntries}\n${repeatSpaces(depth)}}`;
 };
 
-const getStylishData = (ast, depth = 0) => {
-  const str = '    ';
-  const indent = str.repeat(depth);
-
-  const stylishData = ast.reduce((acc, node) => {
-    const {
-      type, key, afterValue, beforeValue, children,
-    } = node;
-
-    switch (type) {
-      case 'added':
-        acc.push(`${indent}  + ${key}: ${stringify(afterValue, depth)}`);
-        break;
-      case 'deleted':
-        acc.push(`${indent}  - ${key}: ${stringify(beforeValue, depth)}`);
-        break;
-      case 'changed':
-        acc.push([`${indent}  - ${key}: ${stringify(beforeValue, depth)}`]);
-        acc.push([`${indent}  + ${key}: ${stringify(afterValue, depth)}`]);
-        break;
-      case 'unchanged':
-        acc.push(`${indent}    ${key}: ${stringify(beforeValue, depth)}`);
-        break;
-      case 'nested':
-        acc.push(`${indent}    ${key}: ${getStylishData(children, depth + 1)}`);
-        break;
-      default:
-        throw new Error(`Unknown type: ${type}`);
-    }
-
-    return acc;
-  }, []);
-
-  return `{\n${stylishData.join('\n')}\n${indent}}`;
+const mapping = {
+  nested: ({ key, children }, depth, func) => `${repeatSpaces(depth)}${key}: ${func(children, depth + 1)}`,
+  removed: ({ key, value }, depth) => `${repeatSpaces(depth, 2)}- ${key}: ${stringify(value, depth, mapping)}`,
+  added: ({ key, value }, depth) => `${repeatSpaces(depth, 2)}+ ${key}: ${stringify(value, depth, mapping)}`,
+  unchanged: ({ key, value }, depth) => `${repeatSpaces(depth)}${key}: ${stringify(value, depth, mapping)}`,
+  updated: ({ key, newValue, oldValue }, depth) => {
+    const oldValueInfo = `${repeatSpaces(depth, 2)}- ${key}: ${stringify(oldValue, depth, mapping)}`;
+    const newValueInfo = `${repeatSpaces(depth, 2)}+ ${key}: ${stringify(newValue, depth, mapping)}`;
+    return `${oldValueInfo}\n${newValueInfo}`;
+  },
 };
 
-export default (tree) => `${getStylishData(tree)}\n`;
+const generateStylish = (diffTree) => {
+  const iter = (innerDiffTree, depth) => {
+    const stylishTree = innerDiffTree
+        .map((el) => mapping[el.type](el, depth, iter))
+        .join('\n');
+    return `{\n${stylishTree}\n${depth === 1 ? '' : `${repeatSpaces(depth - 1)}`}}`;
+  };
+
+  return iter(diffTree, 1);
+};
+
+export default generateStylish;
