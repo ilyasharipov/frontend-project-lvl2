@@ -1,17 +1,12 @@
 #!/usr/bin/env node
-import { createRequire } from 'module';
-import commander from 'commander';
-import genDiff from '../index.js';
+import program from 'commander';
+import gendiff from '../index.js';
 
-const require = createRequire(import.meta.url);
-
-const { version, description } = require('../package');
-
-commander
-  .version(version)
-  .description(description)
-  .option('-f, --format <type>', 'output format')
-  .arguments('<filepath1> <filepath2>')
-  .action((filepath1, filepath2) => genDiff(filepath1, filepath2));
-
-commander.parse(process.argv);
+program.arguments('<filepath1> <filepath2>')
+    .description('Compares two configuration files and shows a difference.')
+    .version('1.0.0')
+    .option('-f, --format [type]', 'output format', 'stylish')
+    .action((filepath1, filepath2) => {
+        console.log(gendiff(filepath1, filepath2, program.format));
+    })
+    .parse(process.argv);
