@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { test, describe, expect } from '@jest/globals';
 import gendiff from '../index.js';
 
 const generatePathname = (path) => new URL(`../__fixtures__/${path}`, import.meta.url).pathname;
@@ -16,28 +17,28 @@ const testsFailOptions = [
 
 describe('gendiff', () => {
   test.each(testsSuccessOptions)('gendiff for %s & %s in %s format',
-      (file1, file2, formatName) => {
-        if (formatName === 'default') {
-          const fileContent = fs.readFileSync(generatePathname('expected_stylish.txt'), 'utf-8');
-          expect(gendiff(generatePathname(file1), generatePathname(file2)))
-              .toBe(fileContent);
-          return;
-        }
-        if (formatName === 'json') {
-          expect(() => {
-            JSON.parse(gendiff(generatePathname(file1), generatePathname(file2), formatName));
-          }).not.toThrowError();
-        }
+    (file1, file2, formatName) => {
+      if (formatName === 'default') {
+        const fileContent = fs.readFileSync(generatePathname('expected_stylish.txt'), 'utf-8');
+        expect(gendiff(generatePathname(file1), generatePathname(file2)))
+          .toBe(fileContent);
+        return;
+      }
+      if (formatName === 'json') {
+        expect(() => {
+          JSON.parse(gendiff(generatePathname(file1), generatePathname(file2), formatName));
+        }).not.toThrowError();
+      }
 
-        const fileContent = fs.readFileSync(generatePathname(`expected_${formatName}.txt`), 'utf-8');
-        expect(gendiff(generatePathname(file1), generatePathname(file2), formatName))
-            .toBe(fileContent);
-      });
+      const fileContent = fs.readFileSync(generatePathname(`expected_${formatName}.txt`), 'utf-8');
+      expect(gendiff(generatePathname(file1), generatePathname(file2), formatName))
+        .toBe(fileContent);
+    });
 
   test.each(testsFailOptions)('gendiff for %s & %s in %s format',
-      (file1, file2, formatName) => {
-        expect(() => {
-          gendiff(generatePathname(file1), generatePathname(file2), formatName);
-        }).toThrowError();
-      });
+    (file1, file2, formatName) => {
+      expect(() => {
+        gendiff(generatePathname(file1), generatePathname(file2), formatName);
+      }).toThrowError();
+    });
 });

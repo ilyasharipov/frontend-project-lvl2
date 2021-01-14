@@ -24,7 +24,7 @@ const outputMapping = {
 
 const generatePlain = (diffTree) => {
   const iter = (innerDiffTree, parentKeys) => innerDiffTree
-      .flatMap((el) => outputMapping[el.type](el, parentKeys, iter));
+    .flatMap((el) => outputMapping[el.type](el, parentKeys, iter));
   return iter(diffTree, []).join('\n');
 };
 

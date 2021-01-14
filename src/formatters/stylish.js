@@ -7,8 +7,8 @@ const stringify = (data, depth, mapping) => {
     return data;
   }
   const dataEntries = Object.entries(data)
-      .map(([key, value]) => mapping.unchanged({ key, value }, depth + 1))
-      .join('\n');
+    .map(([key, value]) => mapping.unchanged({ key, value }, depth + 1))
+    .join('\n');
   return `{\n${dataEntries}\n${repeatSpaces(depth)}}`;
 };
 
@@ -27,8 +27,8 @@ const mapping = {
 const generateStylish = (diffTree) => {
   const iter = (innerDiffTree, depth) => {
     const stylishTree = innerDiffTree
-        .map((el) => mapping[el.type](el, depth, iter))
-        .join('\n');
+      .map((el) => mapping[el.type](el, depth, iter))
+      .join('\n');
     return `{\n${stylishTree}\n${depth === 1 ? '' : `${repeatSpaces(depth - 1)}`}}`;
   };
 
