@@ -1,5 +1,5 @@
 import path from 'path';
-import getDiff from './astBuilder';
+import getDiff from './astBuilder.js';
 import parser from './parsers.js';
 import getPlainOutput from './formatters/formatter.js';
 
